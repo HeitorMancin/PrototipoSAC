@@ -6,6 +6,7 @@ import streamlit as st
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
 df = pd.read_excel(dados)
 
+st.set_page_config(layout="wide")
 df
 
 # Agrupa os dados por atendente e sentimento e conta as ocorrências
