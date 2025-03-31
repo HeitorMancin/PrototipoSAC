@@ -6,6 +6,8 @@ import streamlit as st
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
 df = pd.read_excel(dados)
 
+df
+
 # Agrupa os dados por atendente e sentimento e conta as ocorrências
 sentimentos_por_atendente = df.groupby(['atendente', 'sentimento']).size().reset_index(name='contagem')
 
