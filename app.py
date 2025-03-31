@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 
-dados = "DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
+dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
 df = pd.read_excel(dados)
 
 # Agrupa os dados por atendente e sentimento e conta as ocorrências
