@@ -82,7 +82,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     plt.figure(figsize=(12, 6))
     sns.set_style('whitegrid')
     cores = sns.color_pallete('pastel')
-    }
+    
 
     if len(filtered_data) == 0:
         filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
@@ -90,7 +90,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     else:
         sns.countplot(x='sentimento', data=filtered_data, palette=cores)
 
-    plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')e
+    plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
     plt.xlabel("Sentimento", fontsize=12 )
     plt.ylabel("Contagem", fontsize=12)
     plt.gca().spines[['top', 'right']].set_visible(False)
