@@ -67,12 +67,12 @@ plt.ylabel('Contagem')
 plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
 plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
 
-#st.pyplot(plt.gcf())  # Exibir o gráfico no Streamlit
+#st.pyplot(plt.gcf())  # Exibir o gráfico no Streamlit#
 
-df = pd.read_excel("DF.xlsx", engine='openpyxl')
+# Carregamento e pré-processamento de dados
+df = pd.read_excel("DF.xlsx", engine='openpyxl')  # Substitua "DF.xlsx" pelo caminho real do seu arquivo
 df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
-
 
 # Função para plotar o gráfico
 def plot_filtered_sentiments(atendente, sentimentos):
@@ -91,23 +91,22 @@ def plot_filtered_sentiments(atendente, sentimentos):
     plt.xlabel("Sentimento")
     plt.ylabel("Contagem")
     plt.gca().spines[['top', 'right']].set_visible(False)
+    plt.xticks(rotation=45, ha='right') # Rotação dos rótulos do eixo x
 
     plt.tight_layout()
-    plt.show()
+    st.pyplot(plt)  # Exibir o gráfico no Streamlit
 
-# Obter todos os atendentes e sentimentos únicos
+# Interface do Streamlit
+st.title("Análise de Sentimentos de Atendentes")
+
+# Seleção de Atendente
 todos_atendentes = df_filtrado['atendente'].unique().tolist()
+atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
+
+# Seleção de Sentimentos
 todos_sentimentos = df_filtrado['sentimento'].unique().tolist()
+sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
 
-# Solicitar input do usuário para atendente e sentimentos
-print("Atendentes disponíveis:", todos_atendentes)
-atendente_selecionado = input("Selecione um atendente: ")
-
-print("\nSentimentos disponíveis:", todos_sentimentos)
-sentimentos_selecionados_str = input("Selecione sentimentos (separados por vírgula): ")
-
-# Converter a string de sentimentos em uma lista
-sentimentos_selecionados = [s.strip() for s in sentimentos_selecionados_str.split(',')]
-
-# Chamar a função para plotar o gráfico
-plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
+# Botão para gerar o gráfico
+if st.button("Gerar Gráfico"):
+    plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
