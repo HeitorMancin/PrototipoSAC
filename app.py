@@ -104,8 +104,11 @@ if st.button("Gerar Gráfico"):
 
     # Gráfico de pizza na coluna da direita
     with col_outra_visualizacao:
+        fig, ax = plt.subplots(figsize=(8, 4))  # Reduzindo o tamanho do gráfico
+        sns.set_style('whitegrid')
+        cores = sns.color_palette('pastel')
         st.subheader("Distribuição de Sentimentos")
         sentimentos_contagem = df_filtrado['sentimento'].value_counts()
         fig_pizza, ax_pizza = plt.subplots()
-        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90)
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, palette=cores)
         st.pyplot(fig_pizza)
