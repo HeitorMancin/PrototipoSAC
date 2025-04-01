@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 
-dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
+dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  
 df = pd.read_excel(dados)
 
 st.set_page_config(layout="wide")
@@ -64,7 +64,7 @@ plt.xlabel('Atendente')
 plt.ylabel('Contagem')
 plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
 plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
-plt.show()  # Exibir o gráfico no Streamlit#
+plt.show()
 
 
 
