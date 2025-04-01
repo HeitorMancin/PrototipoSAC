@@ -3,8 +3,6 @@ import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
-import ipywidgets as widgets
-from IPython.display import display, clear_output
 
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
 df = pd.read_excel(dados)
@@ -76,16 +74,13 @@ df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
 
 
+# Função para plotar o gráfico
 def plot_filtered_sentiments(atendente, sentimentos):
-    clear_output(wait=True)
     df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
-
-    # Filtrar os dados pelos sentimentos selecionados
     filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
 
     plt.figure(figsize=(10, 6))
 
-    # Se não houver dados, crie um DataFrame vazio com os sentimentos selecionados
     if len(filtered_data) == 0:
         filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
         sns.barplot(x='sentimento', y='count', data=filtered_data, palette='Dark2')
@@ -100,22 +95,19 @@ def plot_filtered_sentiments(atendente, sentimentos):
     plt.tight_layout()
     plt.show()
 
-# Criar os widgets interativos
-attendant_dropdown = widgets.Dropdown(
-    options=df_filtrado['atendente'].unique(),
-    description='Atendente:'
-)
+# Obter todos os atendentes e sentimentos únicos
+todos_atendentes = df_filtrado['atendente'].unique().tolist()
+todos_sentimentos = df_filtrado['sentimento'].unique().tolist()
 
-# Obter todos os sentimentos únicos
-all_sentiments = df_filtrado['sentimento'].unique().tolist()
+# Solicitar input do usuário para atendente e sentimentos
+print("Atendentes disponíveis:", todos_atendentes)
+atendente_selecionado = input("Selecione um atendente: ")
 
-# Criar um widget SelectMultiple para selecionar os sentimentos
-sentiment_select = widgets.SelectMultiple(
-    options=all_sentiments,
-    value=all_sentiments,  # Inicialmente, seleciona todos os sentimentos
-    description='Sentimentos:',
-    disabled=False
-)
+print("\nSentimentos disponíveis:", todos_sentimentos)
+sentimentos_selecionados_str = input("Selecione sentimentos (separados por vírgula): ")
 
-# Conectar os widgets à função de plotar
-widgets.interact(plot_filtered_sentiments, atendente=attendant_dropdown, sentimentos=sentiment_select);
+# Converter a string de sentimentos em uma lista
+sentimentos_selecionados = [s.strip() for s in sentimentos_selecionados_str.split(',')]
+
+# Chamar a função para plotar o gráfico
+plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
