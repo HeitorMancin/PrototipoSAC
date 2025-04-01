@@ -109,7 +109,10 @@ if gerar_grafico:
     # Gráfico de pizza na coluna da direita
     with col_outra_visualizacao:
         st.subheader("Distribuição de Sentimentos")
-        sentimentos_contagem = df_filtrado['sentimento'].value_counts()
+        df_pizza = df_filtrado[df_filtrado["atendente"] == atendente_selecionado]
+        df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos_selecionados)]
+
+        sentimentos_contagem = df_pizza['sentimento'].value_counts()
         fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4)) # Mesmo tamanho do outro gráfico
         cores = sns.color_palette('pastel')
         ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores) # Usando a mesma paleta de cores
