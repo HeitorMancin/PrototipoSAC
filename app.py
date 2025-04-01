@@ -93,6 +93,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
         sns.countplot(x='sentimento', data=filtered_data, palette=cores)
 
     plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
+    plt.grid(color='gray', linestyle='--', linewidht=0.5)
     plt.xlabel("Sentimento", fontsize=12 )
     plt.ylabel("Contagem", fontsize=12)
     plt.gca().spines[['top', 'right']].set_visible(False)
