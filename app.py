@@ -27,6 +27,29 @@ with col2:
         unsafe_allow_html=True
     )
 
+# Código HTML e CSS para a faixa no cabeçalho
+html_code = """
+<div style='
+    background: #bfd730;
+    background: linear-gradient(133deg, #bfd730 10%, #008fc4 60%);
+    background: -webkit-linear-gradient(133deg, #bfd730 10%, #008fc4 60%);
+    background: -moz-linear-gradient(133deg, #bfd730 10%, #008fc4 60%);
+    margin: 0px 0px 0px 0px;
+    width: 100%;
+    position: fixed;
+    padding: 10px;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 24px; 
+    font-weight: bold; 
+'>
+   Comparador de Bulas
+</div>
+"""
+
 
 df
 
