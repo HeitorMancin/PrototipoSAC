@@ -7,9 +7,7 @@ import streamlit as st
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  # Substitua pelo caminho real para o seu arquivo
 df = pd.read_excel(dados)
 
-
 st.set_page_config(layout="wide")
-
 col1, col2 = st.columns([1, 1])  # Duas colunas de tamanho igual
 
 # Logotipo na primeira coluna (alinhada à esquerda)
@@ -68,44 +66,4 @@ plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melh
 plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
 st.pyplot(plt.gcf())  # Exibir o gráfico no Streamlit#
 
-# Carregamento e pré-processamento de dados
-df = pd.read_excel("DF.xlsx", engine='openpyxl')  # Substitua "DF.xlsx" pelo caminho real do seu arquivo
-df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
-df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
 
-# Função para plotar o gráfico
-def plot_filtered_sentiments(atendente, sentimentos):
-    df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
-    filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
-
-    plt.figure(figsize=(10, 6))
-
-    if len(filtered_data) == 0:
-        filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
-        sns.barplot(x='sentimento', y='count', data=filtered_data, palette='Dark2')
-    else:
-        sns.countplot(x='sentimento', data=filtered_data, palette='Dark2')
-
-    plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)")
-    plt.xlabel("Sentimento")
-    plt.ylabel("Contagem")
-    plt.gca().spines[['top', 'right']].set_visible(False)
-    plt.xticks(rotation=45, ha='right') # Rotação dos rótulos do eixo x
-
-    plt.tight_layout()
-    st.pyplot(plt)  # Exibir o gráfico no Streamlit
-
-# Interface do Streamlit
-st.title("Análise de Sentimentos de Atendentes")
-
-# Seleção de Atendente
-todos_atendentes = df_filtrado['atendente'].unique().tolist()
-atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
-
-# Seleção de Sentimentos
-todos_sentimentos = df_filtrado['sentimento'].unique().tolist()
-sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
-
-# Botão para gerar o gráfico
-if st.button("Gerar Gráfico"):
-    plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
