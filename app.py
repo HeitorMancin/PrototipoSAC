@@ -66,7 +66,6 @@ plt.xlabel('Atendente')
 plt.ylabel('Contagem')
 plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
 plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
-
 st.pyplot(plt.gcf())  # Exibir o gráfico no Streamlit#
 
 # Carregamento e pré-processamento de dados
@@ -94,7 +93,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     plt.xticks(rotation=45, ha='right') # Rotação dos rótulos do eixo x
 
     plt.tight_layout()
-    st.pyplot(plt.gcf())  # Exibir o gráfico no Streamlit
+    st.pyplot(plt)  # Exibir o gráfico no Streamlit
 
 # Interface do Streamlit
 st.title("Análise de Sentimentos de Atendentes")
