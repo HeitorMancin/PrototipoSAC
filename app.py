@@ -16,6 +16,10 @@ with st.sidebar:
     atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
     todos_sentimentos = df['sentimento'].unique().tolist()
     sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
+    if st.button("Gerar Gráfico"):
+        gerar_grafico = True
+    else:
+        gerar_grafico = False
 
 # Colunas para logo e tagline
 col1, col2 = st.columns([1, 1])  # Duas colunas de tamanho igual
@@ -72,7 +76,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
     filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
 
-    fig, ax = plt.subplots(figsize=(8, 4))  # Reduzindo o tamanho do gráfico
+    fig, ax = plt.subplots(figsize=(8, 4))  # Tamanho do gráfico
     sns.set_style('whitegrid')
     cores = sns.color_palette('pastel')
 
@@ -92,7 +96,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     return fig  # Retorna a figura
 
 # Botão para gerar o gráfico
-if st.button("Gerar Gráfico"):
+if gerar_grafico:
     fig_sentimentos = plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
 
     # Colunas para gráfico e outra visualização
@@ -104,11 +108,8 @@ if st.button("Gerar Gráfico"):
 
     # Gráfico de pizza na coluna da direita
     with col_outra_visualizacao:
-        fig, ax = plt.subplots(figsize=(8, 4))  # Reduzindo o tamanho do gráfico
-        sns.set_style('whitegrid')
-        cores = sns.color_palette('pastel')
-        st.subheader("Distribuição de Sentimentos", fontsize=16, fontweight='bold')
-        sentimentos_contagem = df_filtrado['sentimento'].value_counts()(fontsize=16)
-        fig_pizza, ax_pizza = plt.subplots()
-        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, palette=cores)
+        st.subheader("Distribuição de Sentimentos")
+        sentimentos_contagem = df_filtrado['sentimento'].value_counts()
+        fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4)) # Mesmo tamanho do outro gráfico
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=sns.color_palette('pastel')) # Usando a mesma paleta de cores
         st.pyplot(fig_pizza)
