@@ -94,7 +94,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     plt.xticks(rotation=45, ha='right') # Rotação dos rótulos do eixo x
 
     plt.tight_layout()
-    st.pyplot(plt)  # Exibir o gráfico no Streamlit
+    #st.pyplot(plt)  # Exibir o gráfico no Streamlit
 
 # Interface do Streamlit
 st.title("Análise de Sentimentos de Atendentes")
@@ -110,3 +110,4 @@ sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentim
 # Botão para gerar o gráfico
 if st.button("Gerar Gráfico"):
     plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
+st.pyplot(plt)
