@@ -4,6 +4,9 @@ import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Desativa avisos para evitar mensagens de aviso no Streamlit
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
 # Configuração da página
 st.set_page_config(layout="wide", page_title="Análise SAC Biolab")
 
@@ -45,111 +48,157 @@ html_code = """
 """
 components.html(html_code, height=50)
 
-# Carregamento de dados - escolha uma fonte (URL ou arquivo local)
-# Use @st.cache_data para otimizar o carregamento de dados
-@st.cache_data
-def carregar_dados():
+# Carregamento de dados - optando pela abordagem mais simples para depuração
+try:
+    # Primeira tentativa: Carregar da URL
+    url = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"
+    df = pd.read_excel(url)
+    st.success("Dados carregados com sucesso da URL GitHub.")
+except Exception as e:
+    st.warning(f"Erro ao carregar dados da URL: {e}")
     try:
-        # Tenta carregar do GitHub URL
-        url = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"
-        df = pd.read_excel(url)
-    except:
-        # Recorre ao arquivo local se a URL falhar
-        try:
-            df = pd.read_excel("DF.xlsx", engine='openpyxl')
-        except:
-            st.error("Não foi possível carregar os dados. Verifique se o arquivo DF.xlsx está disponível.")
-            return None
-    
-    # Processa a coluna de duração
-    if 'duracao' in df.columns:
+        # Segunda tentativa: Carregar do arquivo local
+        df = pd.read_excel("DF.xlsx", engine='openpyxl')
+        st.success("Dados carregados com sucesso do arquivo local.")
+    except Exception as e:
+        st.error(f"Erro ao carregar dados do arquivo local: {e}")
+        # Criar dados de exemplo para testar a interface
+        st.warning("Usando dados de exemplo para testes.")
+        df = pd.DataFrame({
+            'atendente': ['Ana', 'Ana', 'Carlos', 'Carlos', 'Maria', 'Maria'] * 5,
+            'sentimento': ['Positivo', 'Negativo', 'Neutro', 'Positivo', 'Neutro', 'Negativo'] * 5,
+            'duracao': ['00:06:00', '00:07:30', '00:10:00', '00:05:30', '00:08:00', '00:09:30'] * 5
+        })
+
+# Processa a coluna de duração se existir
+if 'duracao' in df.columns:
+    try:
         df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
-    
-    return df
+    except Exception as e:
+        st.error(f"Erro ao processar a coluna de duração: {e}")
+        # Criar coluna de duração simulada
+        df['duracao'] = pd.to_timedelta(['00:07:00'] * len(df))
 
-# Carrega os dados
-df = carregar_dados()
+# Exibe dados brutos com uma seção expansível
+with st.expander("Ver Dados Brutos"):
+    st.dataframe(df)
 
-if df is not None:
-    # Exibe dados brutos com uma seção expansível
-    with st.expander("Ver Dados Brutos"):
-        st.dataframe(df)
-    
-    # Título principal
-    st.title("Análise de Sentimentos de Atendentes")
-    
-    # Seção de visualização principal
-    st.header("Visão Geral por Atendente")
-    
-    # Primeiro gráfico - sentimento geral por atendente
+# Título principal
+st.title("Análise de Sentimentos de Atendentes")
+
+# Separação clara para depuração
+st.markdown("---")
+st.header("Visão Geral por Atendente")
+
+# Gráfico 1: Visão Geral - Abordagem simplificada usando pyplot diretamente
+try:
+    # Prepara os dados
     sentimentos_por_atendente = df.groupby(['atendente', 'sentimento']).size().reset_index(name='contagem')
     
-    fig1, ax1 = plt.subplots(figsize=(16, 6))
-    sns.barplot(x='atendente', y='contagem', hue='sentimento', data=sentimentos_por_atendente, ax=ax1)
-    ax1.grid(color='gray', linestyle='--', linewidth=0.5, alpha=0.3)
-    ax1.set_title('Sentimento por Atendente')
-    ax1.set_xlabel('Atendente')
-    ax1.set_ylabel('Contagem')
+    # Limpa qualquer gráfico anterior (importante para o Streamlit)
+    plt.clf()
+    
+    # Cria a figura 
+    plt.figure(figsize=(12, 6))
+    ax = sns.barplot(x='atendente', y='contagem', hue='sentimento', data=sentimentos_por_atendente)
+    
+    # Configurações do gráfico
+    plt.title('Sentimento por Atendente')
+    plt.xlabel('Atendente')
+    plt.ylabel('Contagem')
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     
-    st.pyplot(fig1)
+    # Exibe o gráfico
+    st.pyplot()
     
-    # Seção de filtros
-    st.header("Análise Detalhada com Filtros")
-    
-    # Filtra dados para chamadas com mais de 5 minutos
+except Exception as e:
+    st.error(f"Erro ao gerar o gráfico de visão geral: {e}")
+
+# Separação clara para depuração
+st.markdown("---")
+st.header("Análise Detalhada com Filtros")
+
+# Filtra dados para chamadas com mais de 5 minutos
+try:
     df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
-    
-    # Filtros da barra lateral
+    st.write(f"Número de registros após filtro de duração: {len(df_filtrado)}")
+except Exception as e:
+    st.error(f"Erro ao filtrar dados por duração: {e}")
+    df_filtrado = df  # Usa todos os dados se o filtro falhar
+
+# Filtros para o segundo gráfico
+try:
     todos_atendentes = sorted(df_filtrado['atendente'].unique().tolist())
     atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
     
     todos_sentimentos = sorted(df_filtrado['sentimento'].unique().tolist())
     sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
-    
-    # Função para plotar dados filtrados
-    def plotar_sentimentos_filtrados(df, atendente, sentimentos):
-        df_atendente = df[df['atendente'] == atendente]
-        dados_filtrados = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
+except Exception as e:
+    st.error(f"Erro ao configurar filtros: {e}")
+    atendente_selecionado = df_filtrado['atendente'].iloc[0] if not df_filtrado.empty else "Nenhum"
+    sentimentos_selecionados = df_filtrado['sentimento'].unique().tolist() if not df_filtrado.empty else []
+
+# Função para plotar dados filtrados (versão simplificada)
+def plotar_sentimentos_filtrados():
+    try:
+        # Filtrar dados
+        df_atendente = df_filtrado[df_filtrado['atendente'] == atendente_selecionado]
+        dados_filtrados = df_atendente[df_atendente['sentimento'].isin(sentimentos_selecionados)]
         
-        fig, ax = plt.subplots(figsize=(10, 6))
+        # Limpar gráficos anteriores
+        plt.clf()
+        
+        # Criar novo gráfico
+        plt.figure(figsize=(10, 6))
         
         if len(dados_filtrados) == 0:
-            st.warning(f"Nenhum dado encontrado para o atendente {atendente} com os sentimentos selecionados.")
-            dados_dummy = pd.DataFrame({'sentimento': sentimentos, 'contagem': [0] * len(sentimentos)})
-            sns.barplot(x='sentimento', y='contagem', data=dados_dummy, palette='Dark2', ax=ax)
+            st.warning(f"Nenhum dado encontrado para o atendente {atendente_selecionado} com os sentimentos selecionados.")
+            # Criar gráfico vazio
+            plt.bar(sentimentos_selecionados, [0] * len(sentimentos_selecionados))
         else:
-            # Gráfico de contagem para dados filtrados
-            contagem_sentimentos = dados_filtrados['sentimento'].value_counts().reset_index()
-            contagem_sentimentos.columns = ['sentimento', 'contagem']
+            # Contar ocorrências
+            contagem = dados_filtrados['sentimento'].value_counts()
             
-            # Filtra para incluir apenas sentimentos selecionados
-            contagem_sentimentos = contagem_sentimentos[contagem_sentimentos['sentimento'].isin(sentimentos)]
+            # Garantir que todos os sentimentos selecionados apareçam
+            for sentimento in sentimentos_selecionados:
+                if sentimento not in contagem:
+                    contagem[sentimento] = 0
             
-            # Cria o gráfico
-            sns.barplot(x='sentimento', y='contagem', data=contagem_sentimentos, palette='Dark2', ax=ax)
+            # Filtrar apenas os sentimentos selecionados
+            contagem = contagem[sentimentos_selecionados]
+            
+            # Criar gráfico
+            plt.bar(contagem.index, contagem.values, color='skyblue')
         
-        ax.set_title(f"Sentimentos do Atendente: {atendente}")
-        ax.set_xlabel("Sentimento")
-        ax.set_ylabel("Contagem")
-        ax.spines[['top', 'right']].set_visible(False)
+        # Configurar gráfico
+        plt.title(f"Sentimentos do Atendente: {atendente_selecionado}")
+        plt.xlabel("Sentimento")
+        plt.ylabel("Contagem")
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         
-        return fig
-    
-    # Botão para gerar o gráfico filtrado
-    if st.button("Gerar Gráfico"):
-        if sentimentos_selecionados:
-            fig2 = plotar_sentimentos_filtrados(df_filtrado, atendente_selecionado, sentimentos_selecionados)
-            st.pyplot(fig2)
-        else:
-            st.warning("Por favor, selecione pelo menos um sentimento.")
-    
-    # Métricas e insights adicionais
-    st.header("Métricas Adicionais")
-    
+        # Mostrar gráfico
+        st.pyplot()
+        
+    except Exception as e:
+        st.error(f"Erro ao gerar gráfico filtrado: {e}")
+        # Mostra a exceção completa para depuração
+        st.exception(e)
+
+# Botão para gerar o gráfico filtrado
+if st.button("Gerar Gráfico"):
+    if sentimentos_selecionados:
+        plotar_sentimentos_filtrados()
+    else:
+        st.warning("Por favor, selecione pelo menos um sentimento.")
+
+# Separação clara para depuração
+st.markdown("---")
+st.header("Métricas Adicionais")
+
+# Exibir métricas básicas
+try:
     col_metricas1, col_metricas2, col_metricas3 = st.columns(3)
     
     with col_metricas1:
@@ -163,5 +212,19 @@ if df is not None:
     with col_metricas3:
         sentimento_predominante = df['sentimento'].value_counts().idxmax()
         st.metric("Sentimento Predominante", sentimento_predominante)
-else:
-    st.error("Não foi possível processar os dados. Verifique o formato do arquivo.")
+except Exception as e:
+    st.error(f"Erro ao exibir métricas: {e}")
+
+# Informações de depuração
+st.markdown("---")
+with st.expander("Informações de Depuração"):
+    st.write("Formato do DataFrame:")
+    st.write(df.dtypes)
+    st.write("Primeiras linhas:")
+    st.write(df.head())
+    st.write("Estatísticas:")
+    st.write(df.describe())
+    st.write("Informações da coluna de duração:")
+    if 'duracao' in df.columns:
+        st.write(f"Tipo da coluna duracao: {type(df['duracao'].iloc[0])}")
+        st.write(f"Valores únicos de duracao: {df['duracao'].unique()[:5]}")
