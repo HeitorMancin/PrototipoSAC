@@ -50,7 +50,10 @@ html_code = """
 # Renderiza o HTML na aplicação Streamlit
 components.html(html_code, height=50)
 
+#Visualização da tabela toda
 df
+
+d = st.sidebar.date_imput("Selecione a data das transcrições", datetime.date)
 
 # Agrupa os dados por atendente e sentimento e conta as ocorrências
 sentimentos_por_atendente = df.groupby(['atendente', 'sentimento']).size().reset_index(name='contagem')
@@ -92,8 +95,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
     else:
         sns.countplot(x='sentimento', data=filtered_data, palette=cores)
 
-    plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
-    plt.grid(color='gray', linestyle='--', linewidht=0.5)
+    plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')e
     plt.xlabel("Sentimento", fontsize=12 )
     plt.ylabel("Contagem", fontsize=12)
     plt.gca().spines[['top', 'right']].set_visible(False)
