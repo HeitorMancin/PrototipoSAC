@@ -78,13 +78,12 @@ def plot_filtered_sentiments(atendente, sentimentos):
 
     fig, ax = plt.subplots(figsize=(8, 4))  # Tamanho do gráfico
     sns.set_style('whitegrid')
-    cores = sns.color_palette('pastel')
 
     if len(filtered_data) == 0:
         filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
-        sns.barplot(x='sentimento', y='count', data=filtered_data, palette=cores, ax=ax)
+        sns.barplot(x='sentimento', y='count', data=filtered_data, ax=ax)
     else:
-        sns.countplot(x='sentimento', data=filtered_data, palette=cores, ax=ax)
+        sns.countplot(x='sentimento', data=filtered_data, ax=ax)
 
     ax.set_title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
     ax.set_xlabel("Sentimento", fontsize=12)
@@ -111,5 +110,5 @@ if gerar_grafico:
         st.subheader("Distribuição de Sentimentos")
         sentimentos_contagem = df_filtrado['sentimento'].value_counts()
         fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4)) # Mesmo tamanho do outro gráfico
-        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=sns.color_palette('pastel')) # Usando a mesma paleta de cores
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90)
         st.pyplot(fig_pizza)
