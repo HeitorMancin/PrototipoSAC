@@ -49,7 +49,8 @@ html_code = """
    Comparador de Bulas
 </div>
 """
-
+# Renderiza o HTML na aplicação Streamlit
+components.html(html_code, height=50)
 
 df
 
