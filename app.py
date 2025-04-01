@@ -93,7 +93,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
 
 # Botão para gerar o gráfico
 if st.button("Gerar Gráfico"):
-    fig_sentimentos = plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
+    fig_sentimentos = plot_filtered_sentimentos(atendente_selecionado, sentimentos_selecionados)
 
     # Colunas para gráfico e outra visualização
     col_grafico, col_outra_visualizacao = st.columns(2)
@@ -104,11 +104,8 @@ if st.button("Gerar Gráfico"):
 
     # Gráfico de pizza na coluna da direita
     with col_outra_visualizacao:
-        fig, ax = plt.subplots(figsize=(8, 4))  # Reduzindo o tamanho do gráfico
-        sns.set_style('whitegrid')
-        cores = sns.color_palette('pastel')
         st.subheader("Distribuição de Sentimentos")
         sentimentos_contagem = df_filtrado['sentimento'].value_counts()
         fig_pizza, ax_pizza = plt.subplots()
-        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, palette=cores)
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90)
         st.pyplot(fig_pizza)
