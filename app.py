@@ -55,18 +55,18 @@ df
 # Agrupa os dados por atendente e sentimento e conta as ocorrências
 sentimentos_por_atendente = df.groupby(['atendente', 'sentimento']).size().reset_index(name='contagem')
 
-'''
+
 # Cria o simples gráfico de barras
-fig, ax = plt.subplots(figsize=(16, 6))  # Cria a figura e os eixos
-sns.barplot(x='atendente', y='contagem', hue='sentimento', data=sentimentos_por_atendente, ax=ax) # passa os eixos para o seaborn
-ax.grid(color='gray', linestyle='--', linewidth=0.5)
-ax.set_title('Sentimento por Atendente')
-ax.set_xlabel('Atendente')
-ax.set_ylabel('Contagem')
-plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
-plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
-st.pyplot(fig) #passa a figura para o Streamlit
-'''
+#fig, ax = plt.subplots(figsize=(16, 6))  # Cria a figura e os eixos
+#sns.barplot(x='atendente', y='contagem', hue='sentimento', data=sentimentos_por_atendente, ax=ax) # passa os eixos para o seaborn
+#ax.grid(color='gray', linestyle='--', linewidth=0.5)
+#ax.set_title('Sentimento por Atendente')
+#ax.set_xlabel('Atendente')
+#ax.set_ylabel('Contagem')
+#plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
+#plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
+#st.pyplot(fig) #passa a figura para o Streamlit
+
 
 # Carregamento e pré-processamento de dados
 df = pd.read_excel(dados, engine='openpyxl')  # Substitua "DF.xlsx" pelo caminho real do seu arquivo
