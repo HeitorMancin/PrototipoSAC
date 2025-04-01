@@ -108,7 +108,7 @@ if gerar_grafico:
 
     # Gráfico de pizza na coluna da direita
     with col_outra_visualizacao:
-        st.subheader("Distribuição de Sentimentos")
+        st.title("Distribuição de Sentimentos")
         df_pizza = df_filtrado[df_filtrado["atendente"] == atendente_selecionado]
         df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos_selecionados)]
 
