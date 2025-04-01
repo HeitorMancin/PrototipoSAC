@@ -80,7 +80,11 @@ def plot_filtered_sentiments(atendente, sentimentos):
 
     plt.figure(figsize=(12, 6))
     sns.set_style('whitegrid')
-    cores = sns.color_palette('pastel')
+    cores = {
+        "otimo": "#32ceed",
+        "bom": "#19bd17",
+        "ruim": "#f00505"
+    }
 
     if len(filtered_data) == 0:
         filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
@@ -89,7 +93,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
         sns.countplot(x='sentimento', data=filtered_data, palette=cores)
 
     plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
-    plt.xlabel("Sentimento", fontsize=12)
+    plt.xlabel("Sentimento", fontsize=12 )
     plt.ylabel("Contagem", fontsize=12)
     plt.gca().spines[['top', 'right']].set_visible(False)
     plt.xticks(rotation=45, ha='right', fontsize=10) # Rotação dos rótulos do eixo x
