@@ -81,7 +81,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
 
     plt.figure(figsize=(12, 6))
     sns.set_style('whitegrid')
-    cores = sns.color_pallete('pastel')
+    cores = sns.color_palette('pastel')
     
 
     if len(filtered_data) == 0:
