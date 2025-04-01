@@ -4,10 +4,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 
-dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"  
+dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"
 df = pd.read_excel(dados)
 
 st.set_page_config(layout="wide")
+
+# Sidebar
+with st.sidebar:
+    st.header("Filtros")
+    todos_atendentes = df['atendente'].unique().tolist()
+    atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
+    todos_sentimentos = df['sentimento'].unique().tolist()
+    sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
+
+# Colunas para logo e tagline
 col1, col2 = st.columns([1, 1])  # Duas colunas de tamanho igual
 
 # Logotipo na primeira coluna (alinhada à esquerda)
@@ -41,36 +51,19 @@ html_code = """
     text-align: center;
     color: white;
     font-family: Arial, sans-serif;
-    font-size: 24px; 
-    font-weight: bold; 
+    font-size: 24px;
+    font-weight: bold;
 '>
-   Transcrições do SAC
+    Transcrições do SAC
 </div>
 """
 # Renderiza o HTML na aplicação Streamlit
 components.html(html_code, height=50)
 
-#Visualização da tabela toda
+# Visualização da tabela toda
 df
 
-# Agrupa os dados por atendente e sentimento e conta as ocorrências
-sentimentos_por_atendente = df.groupby(['atendente', 'sentimento']).size().reset_index(name='contagem')
-
-
-# Cria o simples gráfico de barras
-#fig, ax = plt.subplots(figsize=(16, 6))  # Cria a figura e os eixos
-#sns.barplot(x='atendente', y='contagem', hue='sentimento', data=sentimentos_por_atendente, ax=ax) # passa os eixos para o seaborn
-#ax.grid(color='gray', linestyle='--', linewidth=0.5)
-#ax.set_title('Sentimento por Atendente')
-#ax.set_xlabel('Atendente')
-#ax.set_ylabel('Contagem')
-#plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
-#plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
-#st.pyplot(fig) #passa a figura para o Streamlit
-
-
 # Carregamento e pré-processamento de dados
-df = pd.read_excel(dados, engine='openpyxl')  # Substitua "DF.xlsx" pelo caminho real do seu arquivo
 df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
 
@@ -79,38 +72,40 @@ def plot_filtered_sentiments(atendente, sentimentos):
     df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
     filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
 
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(8, 4))  # Reduzindo o tamanho do gráfico
     sns.set_style('whitegrid')
     cores = sns.color_palette('pastel')
-    
 
     if len(filtered_data) == 0:
         filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
-        sns.barplot(x='sentimento', y='count', data=filtered_data, palette=cores)
+        sns.barplot(x='sentimento', y='count', data=filtered_data, palette=cores, ax=ax)
     else:
-        sns.countplot(x='sentimento', data=filtered_data, palette=cores)
+        sns.countplot(x='sentimento', data=filtered_data, palette=cores, ax=ax)
 
-    plt.title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
-    plt.xlabel("Sentimento", fontsize=12 )
-    plt.ylabel("Contagem", fontsize=12)
-    plt.gca().spines[['top', 'right']].set_visible(False)
-    plt.xticks(rotation=45, ha='right', fontsize=10) # Rotação dos rótulos do eixo x
+    ax.set_title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
+    ax.set_xlabel("Sentimento", fontsize=12)
+    ax.set_ylabel("Contagem", fontsize=12)
+    ax.spines[['top', 'right']].set_visible(False)
+    plt.xticks(rotation=45, ha='right', fontsize=10)  # Rotação dos rótulos do eixo x
 
     plt.tight_layout()
-    st.pyplot(plt)  # Exibir o gráfico no Streamlit
-
-
-# Interface do Streamlit
-st.title("Análise de Sentimentos de Atendentes")
-
-# Seleção de Atendente
-todos_atendentes = df_filtrado['atendente'].unique().tolist()
-atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
-
-# Seleção de Sentimentos
-todos_sentimentos = df_filtrado['sentimento'].unique().tolist()
-sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
+    return fig  # Retorna a figura
 
 # Botão para gerar o gráfico
 if st.button("Gerar Gráfico"):
-    plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
+    fig_sentimentos = plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
+
+    # Colunas para gráfico e outra visualização
+    col_grafico, col_outra_visualizacao = st.columns(2)
+
+    # Gráfico de barras na coluna da esquerda
+    with col_grafico:
+        st.pyplot(fig_sentimentos)
+
+    # Gráfico de pizza na coluna da direita
+    with col_outra_visualizacao:
+        st.subheader("Distribuição de Sentimentos")
+        sentimentos_contagem = df_filtrado['sentimento'].value_counts()
+        fig_pizza, ax_pizza = plt.subplots()
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90)
+        st.pyplot(fig_pizza)
