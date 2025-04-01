@@ -64,6 +64,6 @@ plt.xlabel('Atendente')
 plt.ylabel('Contagem')
 plt.xticks(rotation=45, ha='right')  # Rotaciona os rótulos do eixo x para melhor legibilidade
 plt.tight_layout()  # Ajusta o layout para evitar sobreposição de elementos
-st.pyplot(plt.gcf())  # Exibir o gráfico no Streamlit#
+st.pyplot()  # Exibir o gráfico no Streamlit#
 
 
