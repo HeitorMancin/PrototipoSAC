@@ -70,7 +70,7 @@ df
 # Carregamento e pré-processamento de dados
 df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
-
+cores = sns.color_palette('pastel')
 # Função para plotar o gráfico
 def plot_filtered_sentiments(atendente, sentimentos):
     df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
@@ -81,7 +81,7 @@ def plot_filtered_sentiments(atendente, sentimentos):
 
     if len(filtered_data) == 0:
         filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
-        sns.barplot(x='sentimento', y='count', data=filtered_data, ax=ax)
+        sns.barplot(x='sentimento', y='count', data=filtered_data, palette=cores, ax=ax)
     else:
         sns.countplot(x='sentimento', data=filtered_data, ax=ax)
 
@@ -110,5 +110,5 @@ if gerar_grafico:
         st.subheader("Distribuição de Sentimentos")
         sentimentos_contagem = df_filtrado['sentimento'].value_counts()
         fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4)) # Mesmo tamanho do outro gráfico
-        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90)
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=sns.color_palette('pastel'))
         st.pyplot(fig_pizza)
