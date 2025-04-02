@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 
+# Carregar os dados
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"
 df = pd.read_excel(dados)
 
@@ -16,13 +17,10 @@ with st.sidebar:
     atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
     todos_sentimentos = df['sentimento'].unique().tolist()
     sentimentos_selecionados = st.multiselect("Selecione sentimentos:", todos_sentimentos, default=todos_sentimentos)
-    if st.button("Gerar Gráfico"):
-        gerar_grafico = True
-    else:
-        gerar_grafico = False
+    gerar_grafico = st.button("Gerar Gráfico")
 
 # Colunas para logo e tagline
-col1, col2 = st.columns([1, 1])  # Duas colunas de tamanho igual
+col1, col2 = st.columns([1, 1])
 
 # Logotipo na primeira coluna (alinhada à esquerda)
 with col1:
@@ -44,8 +42,6 @@ html_code = """
 <div style='
     background: #bfd730;
     background: linear-gradient(133deg, #bfd730 10%, #008fc4 60%);
-    background: -webkit-linear-gradient(133deg, #bfd730 10%, #008fc4 60%);
-    background: -moz-linear-gradient(133deg, #bfd730 10%, #008fc4 60%);
     margin: 0px 0px 0px 0px;
     width: 100%;
     position: fixed;
@@ -61,22 +57,18 @@ html_code = """
     Transcrições do SAC
 </div>
 """
-# Renderiza o HTML na aplicação Streamlit
 components.html(html_code, height=50)
-
-# Visualização da tabela toda
-df
 
 # Carregamento e pré-processamento de dados
 df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
 
-# Função para plotar o gráfico
+# Função para plotar gráfico de barras
 def plot_filtered_sentiments(atendente, sentimentos):
     df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
     filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
 
-    fig, ax = plt.subplots(figsize=(8, 4))  # Tamanho do gráfico
+    fig, ax = plt.subplots(figsize=(8, 4))
     sns.set_style('whitegrid')
     cores = sns.color_palette('pastel')
 
@@ -90,33 +82,47 @@ def plot_filtered_sentiments(atendente, sentimentos):
     ax.set_xlabel("Sentimento", fontsize=12)
     ax.set_ylabel("Contagem", fontsize=12)
     ax.spines[['top', 'right']].set_visible(False)
-    plt.xticks(rotation=45, ha='right', fontsize=10)  # Rotação dos rótulos do eixo x
-
+    plt.xticks(rotation=45, ha='right', fontsize=10)
     plt.tight_layout()
-    return fig  # Retorna a figura
+    return fig
 
-# Botão para gerar o gráfico
-if gerar_grafico:
-    fig_sentimentos = plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
-
-    # Colunas para gráfico e outra visualização
-    col_grafico, col_outra_visualizacao = st.columns(2)
-
-    # Gráfico de barras na coluna da esquerda
-    with col_grafico:
-        st.pyplot(fig_sentimentos)
-                
-    # Gráfico de pizza na coluna da direita
-with col_outra_visualizacao:
-    st.title("Distribuição de Sentimentos")
-    df_pizza = df_filtrado[df_filtrado["atendente"] == atendente_selecionado]
-    df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos_selecionados)]
+# Função para plotar gráfico de pizza
+def plot_pie_chart(atendente, sentimentos):
+    df_pizza = df_filtrado[df_filtrado["atendente"] == atendente]
+    df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos)]
 
     sentimentos_contagem = df_pizza['sentimento'].value_counts()
-    # Associar cores específicas aos sentimentos
-    cores_dict = {sentimento: cores[i] for i, sentimento in enumerate(todos_sentimentos)}
+    cores_dict = {sentimento: sns.color_palette('pastel')[i] for i, sentimento in enumerate(todos_sentimentos)}
     cores_usadas = [cores_dict[sentimento] for sentimento in sentimentos_contagem.index]
 
-    fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))  # Mesmo tamanho do outro gráfico
+    fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))
     ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores_usadas)
-    st.pyplot(fig_pizza)
+    ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    return fig_pizza
+
+# Função para criar arquivo txt
+def gerar_txt(dataframe):
+    texto = dataframe.to_string(index=False)
+    with open("output.txt", "w", encoding="utf-8") as f:
+        f.write(texto)
+    return "output.txt"
+
+# Botão para gerar e baixar arquivo txt
+if st.sidebar.button("Baixar seleção em .txt"):
+    arquivo = gerar_txt(df_filtrado)
+    with open(arquivo, "rb") as f:
+        st.download_button(label="Baixar Arquivo .txt", data=f, file_name="seleção.txt", mime="text/plain")
+
+# Gerar gráficos
+if gerar_grafico:
+    fig_sentimentos = plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
+    fig_pizza = plot_pie_chart(atendente_selecionado, sentimentos_selecionados)
+
+    col_grafico, col_outra_visualizacao = st.columns(2)
+
+    with col_grafico:
+        st.pyplot(fig_sentimentos)
+
+    with col_outra_visualizacao:
+        st.pyplot(fig_pizza)
