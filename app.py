@@ -11,7 +11,6 @@ st.set_page_config(layout="wide")
 
 # Sidebar
 with st.sidebar:
-    st.image("https://www.biolabfarma.com.br/wp-content/themes/biolabtheme/assets/images/logo-menu.png", width=150)
     st.header("Filtros")
     todos_atendentes = df['atendente'].unique().tolist()
     atendente_selecionado = st.selectbox("Selecione um atendente:", todos_atendentes)
@@ -27,7 +26,7 @@ col1, col2 = st.columns([1, 1])  # Duas colunas de tamanho igual
 
 # Logotipo na primeira coluna (alinhada à esquerda)
 with col1:
-    #st.image("https://www.biolabfarma.com.br/wp-content/themes/biolabtheme/assets/images/logo-menu.png", width=150)
+    st.image("https://www.biolabfarma.com.br/wp-content/themes/biolabtheme/assets/images/logo-menu.png", width=150)
 
 # TAG 'Viva a Evolução' na segunda coluna (alinhada à direita)
 with col2:
