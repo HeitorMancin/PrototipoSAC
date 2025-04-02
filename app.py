@@ -105,15 +105,18 @@ if gerar_grafico:
     # Gráfico de barras na coluna da esquerda
     with col_grafico:
         st.pyplot(fig_sentimentos)
-
+                
     # Gráfico de pizza na coluna da direita
-    with col_outra_visualizacao:
-        st.title("Distribuição de Sentimentos")
-        df_pizza = df_filtrado[df_filtrado["atendente"] == atendente_selecionado]
-        df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos_selecionados)]
+with col_outra_visualizacao:
+    st.title("Distribuição de Sentimentos")
+    df_pizza = df_filtrado[df_filtrado["atendente"] == atendente_selecionado]
+    df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos_selecionados)]
 
-        sentimentos_contagem = df_pizza['sentimento'].value_counts()
-        fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4)) # Mesmo tamanho do outro gráfico
-        cores = sns.color_palette('pastel')
-        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores) # Usando a mesma paleta de cores
-        st.pyplot(fig_pizza)
+    sentimentos_contagem = df_pizza['sentimento'].value_counts()
+    # Associar cores específicas aos sentimentos
+    cores_dict = {sentimento: cores[i] for i, sentimento in enumerate(todos_sentimentos)}
+    cores_usadas = [cores_dict[sentimento] for sentimento in sentimentos_contagem.index]
+
+    fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))  # Mesmo tamanho do outro gráfico
+    ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores_usadas)
+    st.pyplot(fig_pizza)
