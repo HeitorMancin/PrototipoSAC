@@ -72,9 +72,12 @@ def gerar_txt(dataframe):
 
 # Tabela com seleção de linha
 st.write("### Tabela de Dados (Clique em uma linha para selecionar)")
-selected_indices = st.data_editor(df_filtrado, use_container_width=True, key="data_table", hide_index=True)
-selected_row = df_filtrado.loc[selected_indices] if selected_indices else None
-
+selected_indices = st.experimental_data_editor(df_filtrado, use_container_width=True, key="data_table", hide_index=True)
+if selected_indices is not None and not selected_indices.empty:
+    selected_row = df_filtrado.loc[selected_indices]
+else:
+    selected_row = None
+    
 # Botão de download acima da tabela
 if selected_row is not None:
     st.write("Linha selecionada:")
