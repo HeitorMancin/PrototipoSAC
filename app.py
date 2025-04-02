@@ -7,11 +7,10 @@ import streamlit as st
 # Carregar os dados
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"
 df = pd.read_excel(dados)
-df
 
 st.set_page_config(layout="wide")
 
-# Sidebar
+# Sidebar para filtros
 with st.sidebar:
     st.header("Filtros")
     todos_atendentes = df['atendente'].unique().tolist()
@@ -98,19 +97,22 @@ def plot_pie_chart(atendente, sentimentos):
 
     fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))
     ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores_usadas)
-    ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold')
+    ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold', color="blue")
     plt.tight_layout()
     return fig_pizza
 
-# Função para criar arquivo txt
+# Botão para gerar e baixar arquivo txt
 def gerar_txt(dataframe):
     texto = dataframe.to_string(index=False)
     with open("output.txt", "w", encoding="utf-8") as f:
         f.write(texto)
     return "output.txt"
 
-# Botão para gerar e baixar arquivo txt
-if st.sidebar.button("Baixar seleção em .txt"):
+# Exibição da tabela e botão de download
+st.write("### Tabela de Dados")
+st.dataframe(df_filtrado)
+
+if st.button("Baixar seleção em .txt"):
     arquivo = gerar_txt(df_filtrado)
     with open(arquivo, "rb") as f:
         st.download_button(label="Baixar Arquivo .txt", data=f, file_name="seleção.txt", mime="text/plain")
