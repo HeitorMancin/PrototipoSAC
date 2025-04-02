@@ -63,62 +63,66 @@ components.html(html_code, height=50)
 df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
 
-# Função para plotar gráfico de barras
-def plot_filtered_sentiments(atendente, sentimentos):
-    df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
-    filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
-
-    fig, ax = plt.subplots(figsize=(8, 4))
-    sns.set_style('whitegrid')
-    cores = sns.color_palette('pastel')
-
-    if len(filtered_data) == 0:
-        filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
-        sns.barplot(x='sentimento', y='count', data=filtered_data, palette=cores, ax=ax)
-    else:
-        sns.countplot(x='sentimento', data=filtered_data, palette=cores, ax=ax)
-
-    ax.set_title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
-    ax.set_xlabel("Sentimento", fontsize=12)
-    ax.set_ylabel("Contagem", fontsize=12)
-    ax.spines[['top', 'right']].set_visible(False)
-    plt.xticks(rotation=45, ha='right', fontsize=10)
-    plt.tight_layout()
-    return fig
-
-# Função para plotar gráfico de pizza
-def plot_pie_chart(atendente, sentimentos):
-    df_pizza = df_filtrado[df_filtrado["atendente"] == atendente]
-    df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos)]
-
-    sentimentos_contagem = df_pizza['sentimento'].value_counts()
-    cores_dict = {sentimento: sns.color_palette('pastel')[i] for i, sentimento in enumerate(todos_sentimentos)}
-    cores_usadas = [cores_dict[sentimento] for sentimento in sentimentos_contagem.index]
-
-    fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))
-    ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores_usadas)
-    ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold', color="black")
-    plt.tight_layout()
-    return fig_pizza
-
-# Botão para gerar e baixar arquivo txt
+# Função para criar o arquivo txt
 def gerar_txt(dataframe):
     texto = dataframe.to_string(index=False)
     with open("output.txt", "w", encoding="utf-8") as f:
         f.write(texto)
     return "output.txt"
 
-# Exibição da tabela e botão de download
-st.write("### Tabela de Dados")
-st.dataframe(df_filtrado)
+# Tabela com seleção de linha
+st.write("### Tabela de Dados (Clique em uma linha para selecionar)")
+selected_indices = st.data_editor(df_filtrado, use_container_width=True, key="data_table", hide_index=True)
+selected_row = df_filtrado.loc[selected_indices] if selected_indices else None
 
-if st.download_button("Baixar arquivo em .txt", data=f, file_name='seleção.txt', mime='text/plain'):
-    arquivo = gerar_txt(df_filtrado)
-    with open(arquivo, "rb") as f:
-        st.download_button
+# Botão de download acima da tabela
+if selected_row is not None:
+    st.write("Linha selecionada:")
+    st.dataframe(selected_row)
+    if st.button("Baixar Arquivo Selecionado em .txt"):
+        arquivo = gerar_txt(selected_row)
+        with open(arquivo, "rb") as f:
+            st.download_button(label="Baixar Arquivo .txt", data=f, file_name="seleção.txt", mime="text/plain")
 
 # Gerar gráficos
 if gerar_grafico:
+    # Função para plotar gráfico de barras
+    def plot_filtered_sentiments(atendente, sentimentos):
+        df_atendente = df_filtrado[df_filtrado['atendente'] == atendente]
+        filtered_data = df_atendente[df_atendente['sentimento'].isin(sentimentos)]
+        fig, ax = plt.subplots(figsize=(8, 4))
+        sns.set_style('whitegrid')
+        cores = sns.color_palette('pastel')
+
+        if len(filtered_data) == 0:
+            filtered_data = pd.DataFrame({'sentimento': sentimentos, 'count': [0] * len(sentimentos)})
+            sns.barplot(x='sentimento', y='count', data=filtered_data, palette=cores, ax=ax)
+        else:
+            sns.countplot(x='sentimento', data=filtered_data, palette=cores, ax=ax)
+
+        ax.set_title(f"Sentimentos do Atendente: {atendente} (Filtrado)", fontsize=16, fontweight='bold')
+        ax.set_xlabel("Sentimento", fontsize=12)
+        ax.set_ylabel("Contagem", fontsize=12)
+        ax.spines[['top', 'right']].set_visible(False)
+        plt.xticks(rotation=45, ha='right', fontsize=10)
+        plt.tight_layout()
+        return fig
+
+    # Função para plotar gráfico de pizza
+    def plot_pie_chart(atendente, sentimentos):
+        df_pizza = df_filtrado[df_filtrado["atendente"] == atendente]
+        df_pizza = df_pizza[df_pizza["sentimento"].isin(sentimentos)]
+
+        sentimentos_contagem = df_pizza['sentimento'].value_counts()
+        cores_dict = {sentimento: sns.color_palette('pastel')[i] for i, sentimento in enumerate(todos_sentimentos)}
+        cores_usadas = [cores_dict[sentimento] for sentimento in sentimentos_contagem.index]
+
+        fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))
+        ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores_usadas)
+        ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold', color="blue")
+        plt.tight_layout()
+        return fig_pizza
+
     fig_sentimentos = plot_filtered_sentiments(atendente_selecionado, sentimentos_selecionados)
     fig_pizza = plot_pie_chart(atendente_selecionado, sentimentos_selecionados)
 
