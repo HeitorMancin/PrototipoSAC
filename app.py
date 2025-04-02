@@ -112,10 +112,10 @@ def gerar_txt(dataframe):
 st.write("### Tabela de Dados")
 st.dataframe(df_filtrado)
 
-if st.download_button("Baixar arquivo em .txt", data=f, file_name='seleção.txt', mime='text/plain'):
+if st.download_button("Baixar arquivo em .txt"):
     arquivo = gerar_txt(df_filtrado)
     with open(arquivo, "rb") as f:
-        st.download_button
+        st.download_button(label="Baixar Arquivo .txt", data=f, file_name="seleção.txt", mime="text/plain")
 
 # Gerar gráficos
 if gerar_grafico:
