@@ -62,6 +62,7 @@ components.html(html_code, height=50)
 # Carregamento e pré-processamento de dados
 df['duracao'] = pd.to_timedelta(df['duracao'].astype(str))
 df_filtrado = df[df['duracao'] > pd.Timedelta(minutes=5)]
+st.dataframe(df.style.highlight_null(axis=max))
 
 # Função para plotar gráfico de barras
 def plot_filtered_sentiments(atendente, sentimentos):
