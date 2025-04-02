@@ -7,6 +7,7 @@ import streamlit as st
 # Carregar os dados
 dados = "https://raw.githubusercontent.com/HeitorMancin/PrototipoSAC/refs/heads/main/DF.xlsx"
 df = pd.read_excel(dados)
+df
 
 st.set_page_config(layout="wide")
 
