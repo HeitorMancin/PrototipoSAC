@@ -97,7 +97,7 @@ def plot_pie_chart(atendente, sentimentos):
 
     fig_pizza, ax_pizza = plt.subplots(figsize=(8, 4))
     ax_pizza.pie(sentimentos_contagem, labels=sentimentos_contagem.index, autopct='%1.1f%%', startangle=90, colors=cores_usadas)
-    ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold', color="blue")
+    ax_pizza.set_title(f"Distribuição de Sentimentos: {atendente}", fontsize=14, fontweight='bold', color="black")
     plt.tight_layout()
     return fig_pizza
 
@@ -112,10 +112,10 @@ def gerar_txt(dataframe):
 st.write("### Tabela de Dados")
 st.dataframe(df_filtrado)
 
-if st.button("Baixar seleção em .txt"):
+if st.download_button("Baixar arquivo em .txt", data=f, file_name='seleção.txt', mime='text/plain'):
     arquivo = gerar_txt(df_filtrado)
     with open(arquivo, "rb") as f:
-        st.download_button(label="Baixar Arquivo .txt", data=f, file_name="seleção.txt", mime="text/plain")
+        st.download_button
 
 # Gerar gráficos
 if gerar_grafico:
